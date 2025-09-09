@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plano de Ação | Integridade de Dados</title>
+    <style>
+        /* --- ESTILO GERAL (CSS) --- */
+        body {
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+            font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 1px solid #444;
+            padding-bottom: 20px;
+        }
+
+        header h1 {
+            color: #ffffff;
+            margin: 0;
+            font-size: 2.5em;
+        }
+
+        header p {
+            color: #bbbbbb;
+            font-size: 1.2em;
+        }
+        
+        /* --- ESTILO DO ACORDEÃO --- */
+        .accordion-item {
+            margin-bottom: 15px;
+            border: 1px solid #444;
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: #252525;
+        }
+
+        .accordion-header {
+            background-color: #333;
+            color: #00aaff;
+            padding: 18px 25px;
+            font-size: 1.3em;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+            transition: background-color 0.2s ease;
+        }
+
+        .accordion-header:hover {
+            background-color: #3a3a3a;
+        }
+        
+        .accordion-header::after {
+            content: '+';
+            font-size: 1.8em;
+            font-weight: 300;
+            transition: transform 0.3s ease;
+        }
+
+        .accordion-item.active .accordion-header::after {
+            transform: rotate(45deg);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out, padding 0.3s ease-out;
+            padding: 0 25px;
+        }
+        
+        .accordion-content .content-wrapper {
+            padding: 20px 0;
+        }
+        
+        .accordion-content h4 {
+            color: #00aaff;
+            border-bottom: 1px solid #444;
+            padding-bottom: 5px;
+            margin-top: 20px;
+        }
+        
+        .accordion-content ul, .accordion-content ol {
+            padding-left: 20px;
+        }
+
+        .accordion-content li {
+            margin-bottom: 10px;
+        }
+
+        strong {
+            color: #fafafa;
+        }
+
+        /* --- ESTILO DA TABELA --- */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #444;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #3a3a3a;
+            color: #ffffff;
+        }
+        td {
+            background-color: #2c2c2c;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Plano de Ação: Integridade de Dados de Contratos</h1>
+            <p>Um guia interativo sobre os próximos passos para garantir a consistência e confiabilidade dos nossos dados.</p>
+        </header>
+
+        <div class="accordion-item">
+            <div class="accordion-header">Contexto e Desafio Atual</div>
+            <div class="accordion-content">
+                <div class="content-wrapper">
+                    <p>O recente processo de FIDC expôs fragilidades críticas em nossos dados contratuais. Uma força-tarefa foi mobilizada junto às 14 filiais para um levantamento massivo, que revelou inconsistências como datas de assinatura fantasma e contratos não assinados para clientes ativos.</p>
+                    <p>Com os dados corrigidos pelas filiais em mãos, nos deparamos com uma decisão crucial:</p>
+                    <ul>
+                        <li><strong>A Abordagem de Risco:</strong> Manter uma planilha paralela e atualizá-la manualmente, um método que não resolve a causa do problema e perpetua a desorganização.</li>
+                        <li><strong>A Solução Estrutural:</strong> Importar os dados corrigidos para o ERP e implementar um novo processo para garantir que o sistema seja, a partir de agora, a <strong>única fonte da verdade</strong>.</li>
+                    </ul>
+                    <p><strong>Nossa decisão é seguir com a Solução Estrutural.</strong> Este plano detalha como faremos isso.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="accordion-item">
+            <div class="accordion-header">Fase 1: Consolidação - ERP como Fonte Única da Verdade</div>
+            <div class="accordion-content">
+                <div class="content-wrapper">
+                    <p>Nossa prioridade imediata é capitalizar o trabalho já realizado pela força-tarefa, tornando-o o novo padrão oficial da empresa. As planilhas de controle paralelas serão descontinuadas.</p>
+                    <ol>
+                        <li><strong>Ação Imediata: Importação dos Dados Corrigidos</strong><br>A tarefa mais crítica é a importação de todas as planilhas ajustadas pelas filiais para dentro do nosso sistema ERP.</li>
+                        <li><strong>Validação Pós-Importação</strong><br>Uma equipe multidisciplinar (FP&A, Jurídico, Financeiro) fará uma validação por amostragem para garantir 100% de precisão na migração dos dados.</li>
+                        <li><strong>Estabelecimento do Marco Zero</strong><br>Após a validação, uma data será comunicada a toda a empresa. A partir deste "Marco Zero", o ERP será oficialmente a única fonte confiável de informações contratuais.</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <div class="accordion-header">Fase 2: Novo Processo Operacional - Prevenção e Rigor</div>
+            <div class="accordion-content">
+                <div class="content-wrapper">
+                    <p>Com a base de dados corrigida, precisamos garantir que ela permaneça assim. Os processos a seguir passam a ser <strong>mandatórios e serão monitorados</strong>.</p>
+                    
+                    <h4>1º - Controle Rigoroso no Envio para Assinatura</h4>
+                    <p><strong>Problema a ser evitado:</strong> Contratos sem prazo de vencimento.</p>
+                    <p><strong>Nova Diretriz:</strong> Ao gerar um contrato, o prazo de vencimento deve, obrigatoriamente, respeitar o prazo da proposta comercial. A responsabilidade da conferência é do time que gera o documento.</p>
+
+                    <h4>2º - Baixa Imediata de Contratos Assinados</h4>
+                    <p><strong>Problema a ser evitado:</strong> Clientes ativos com status de contrato "pendente" no sistema, Clientes com datas de assinatura ficticias.</p>
+                    <p><strong>Nova Diretriz:</strong> Ao receber a notificação de assinatura por e-mail, o responsável deve, <strong>no mesmo dia</strong>, alterar o status no ERP para "Assinado", preencher a data da assinatura e anexar o documento PDF.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <div class="accordion-header">Resumo e Próximos Passos</div>
+            <div class="accordion-content">
+                <div class="content-wrapper">
+                    <p>A tabela abaixo resume as principais etapas do plano de ação:</p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Etapa</th>
+                                <th>Objetivo</th>
+                                <th>Responsáveis Principais</th>
+                                <th>Quando</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Importação de Dados</td>
+                                <td>Consolidar o esforço da força-tarefa no sistema oficial.</td>
+                                <td>Equipe Inside</td>
+                                <td><strong>Passo 1</strong></td>
+                            </tr>
+                            <tr>
+                                <td>Validação dos Dados</td>
+                                <td>Garantir a precisão da nova base de dados.</td>
+                                <td>FP&A / Jurídico / Financeiro</td>
+                                <td>Passo 2</td>
+                            </tr>
+                            <tr>
+                                <td>Comunicação "Marco Zero"</td>
+                                <td>Oficializar o ERP como fonte da verdade.</td>
+                                <td>Gestão / Comunicação</td>
+                                <td>Passo 3</td>
+                            </tr>
+                            <tr>
+                                <td>Monitoramento Contínuo</td>
+                                <td>Criar relatórios de auditoria para garantir aderência.</td>
+                                <td>Gestão / Metabase</td>
+                                <td>Contínuo</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- LÓGICA DE INTERATIVIDADE (JAVASCRIPT) ---
+        // Não precisa editar esta parte.
+        document.addEventListener('DOMContentLoaded', () => {
+            const accordionItems = document.querySelectorAll('.accordion-item');
+            
+            // Abre o primeiro item por padrão
+            if (accordionItems.length > 0) {
+                const firstItem = accordionItems[0];
+                firstItem.classList.add('active');
+                const firstContent = firstItem.querySelector('.accordion-content');
+                firstContent.style.maxHeight = firstContent.scrollHeight + 'px';
+            }
+
+            accordionItems.forEach(item => {
+                const header = item.querySelector('.accordion-header');
+                header.addEventListener('click', () => {
+                    const isActive = item.classList.contains('active');
+                    
+                    // Opcional: Fecha todos antes de abrir o novo
+                    // accordionItems.forEach(i => {
+                    //     i.classList.remove('active');
+                    //     i.querySelector('.accordion-content').style.maxHeight = '0px';
+                    // });
+
+                    if (!isActive) {
+                        item.classList.add('active');
+                        const content = item.querySelector('.accordion-content');
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                    } else {
+                        item.classList.remove('active');
+                        const content = item.querySelector('.accordion-content');
+                        content.style.maxHeight = '0px';
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
