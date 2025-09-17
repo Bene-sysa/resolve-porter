@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Otimização de Processos: Contas a Receber</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- RESET E CONFIGURAÇÕES GLOBAIS --- */
+        :root {
+            --background-color: #f8f8fa;
+            --sidebar-bg: #ffffff;
+            --card-bg: #ffffff;
+            --text-primary: #1d1d1f;
+            --text-secondary: #5a5a5e;
+            --accent-color: #007aff;
+            --completed-color: #34c759;
+            --border-color: #e5e5e5;
+            --shadow-color: rgba(0, 0, 0, 0.05);
+            --sidebar-width-expanded: 320px; /* Largura quando expandido */
+            --sidebar-width-collapsed: 70px; /* Largura quando recolhido */
+            --header-height: 90px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+        }
+
+        /* --- CABEÇALHO FIXO --- */
+        header {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-width-collapsed);
+            right: 0;
+            height: var(--header-height);
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            z-index: 999;
+            transition: left 0.3s ease-in-out;
+            box-shadow: 0 2px 8px var(--shadow-color);
+        }
+
+        header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        header p {
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+
+        /* --- MENU LATERAL (SIDEBAR) --- */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-width-collapsed);
+            height: 100vh;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 25px 0;
+            display: flex;
+            flex-direction: column;
+            transition: width 0.3s ease-in-out;
+            z-index: 1000;
+            overflow-x: hidden;
+            box-shadow: 2px 0 8px var(--shadow-color);
+        }
+        
+        .sidebar:hover {
+            width: var(--sidebar-width-expanded);
+        }
+
+        .sidebar:hover ~ header {
+            left: var(--sidebar-width-expanded);
+        }
+        .sidebar:hover ~ main {
+            margin-left: var(--sidebar-width-expanded);
+        }
+
+        .sidebar-header {
+            padding: 0 25px 20px 25px;
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .sidebar:hover .sidebar-header {
+            opacity: 1;
+        }
+        .sidebar-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        .sidebar-menu li {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .sidebar-menu li label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 15px 25px;
+            width: 100%;
+            transition: background-color 0.2s ease;
+        }
+        
+        .sidebar-menu li label:hover {
+            background-color: var(--background-color);
+        }
+
+        .sidebar-menu a {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            flex-grow: 1;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            /* AJUSTE: Permite quebra de linha e limita a 2 linhas */
+            white-space: normal;
+            word-break: break-word;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.4;
+        }
+        .sidebar:hover .sidebar-menu a {
+            opacity: 1;
+        }
+
+        .sidebar-menu .custom-checkbox {
+            opacity: 0;
+            margin-left: -50px;
+            transition: margin-left 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        }
+        .sidebar:hover .sidebar-menu .custom-checkbox {
+            opacity: 1;
+            margin-left: 0;
+        }
+
+        /* --- Estilização do Checkbox Customizado --- */
+        .custom-checkbox {
+            -webkit-appearance: none;
+            appearance: none;
+            background-color: transparent;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 15px;
+            position: relative;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .custom-checkbox:checked {
+            background-color: var(--completed-color);
+            border-color: var(--completed-color);
+        }
+        
+        .custom-checkbox:checked::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 6px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        /* --- Estilo de Item Concluído --- */
+        .completed a {
+            text-decoration: line-through;
+            color: #a0a0a0;
+        }
+        
+        /* --- ÁREA DE CONTEÚDO PRINCIPAL --- */
+        main {
+            margin-left: var(--sidebar-width-collapsed);
+            padding: calc(var(--header-height) + 40px) 40px 40px 40px;
+            transition: margin-left 0.3s ease-in-out;
+            /* AJUSTE: Garante espaço para o último item ser focado */
+            padding-bottom: 50vh;
+        }
+
+        .content-section {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px var(--shadow-color);
+            transition: opacity 0.4s ease-out; /* Transição para o fade */
+        }
+        
+        .content-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .content-section h2 {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+        }
+
+        .content-section h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-top: 25px;
+            margin-bottom: 10px;
+        }
+
+        .content-section p, .content-section li {
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+        
+        .content-section ul {
+            list-style-position: inside;
+            padding-left: 5px;
+        }
+
+        .content-section ul li {
+            margin-bottom: 8px;
+        }
+
+        .content-section ul li::marker {
+            color: var(--accent-color);
+        }
+
+        /* --- Responsividade --- */
+        .menu-toggle {
+            display: none;
+            position: fixed;
+            top: 25px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            z-index: 1001;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hamburger {
+            width: 20px;
+            height: 2px;
+            background: var(--text-primary);
+            position: relative;
+            transition: background 0.2s ease-in-out;
+        }
+        .hamburger::before, .hamburger::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 2px;
+            background: var(--text-primary);
+            transition: transform 0.3s ease-in-out;
+        }
+        .hamburger::before {
+            top: -6px;
+        }
+        .hamburger::after {
+            top: 6px;
+        }
+        
+        body.sidebar-closed .hamburger {
+            background: transparent;
+        }
+        body.sidebar-closed .hamburger::before {
+            transform: rotate(45deg) translate(4px, 4.5px);
+        }
+        body.sidebar-closed .hamburger::after {
+            transform: rotate(-45deg) translate(4px, -4.5px);
+        }
+
+        @media (max-width: 1024px) {
+            :root {
+                --sidebar-width-expanded: 280px;
+            }
+            main {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: var(--sidebar-width-expanded);
+                transform: translateX(-100%);
+                transition: transform 0.3s ease-in-out;
+                box-shadow: 0 0 15px var(--shadow-color);
+            }
+            body.sidebar-closed .sidebar {
+                transform: translateX(0);
+            }
+
+            .sidebar:hover {
+                width: var(--sidebar-width-expanded);
+            }
+            .sidebar:hover ~ header, .sidebar:hover ~ main {
+                left: 0;
+                margin-left: 0;
+            }
+
+            .sidebar-header, .sidebar-menu a, .sidebar-menu .custom-checkbox {
+                opacity: 1;
+                margin-left: 0;
+            }
+
+            header, main {
+                left: 0;
+                margin-left: 0;
+            }
+            header {
+                padding: 0 20px 0 80px;
+            }
+            .menu-toggle {
+                display: flex;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <button class="menu-toggle" id="menu-toggle" aria-label="Abrir menu">
+        <div class="hamburger"></div>
+    </button>
+    
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2>Tópicos da Reunião</h2>
+        </div>
+        <ul class="sidebar-menu">
+            </ul>
+    </nav>
+
+    <header>
+        <h1>Otimização de Processos: Contas a Receber</h1>
+        <p>Alinhamento Estratégico com Rodrigo Almeida | <span id="meeting-date"></span></p>
+    </header>
+
+    <main id="main-content">
+        </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const topics = [
+                {
+                    id: 'reajuste-contratual',
+                    title: '1. Reajuste Contratual via Bonificação ou Desconto - ERP',
+                    objetivo: 'Padronizar o registro de reajustes contratuais no ERP para garantir consistência e rastreabilidade.',
+                    status: 'Decisão Tomada. O método de "Bonificação" foi escolhido. A documentação para lançamento e conferência já está finalizada.',
+                    proposta: [
+                        'Apresentar o fluxo documentado para validação final.',
+                        'Este item pode ser marcado como "Concluído" no início da reunião para demonstrar progresso.'
+                    ]
+                },
+                {
+                    id: 'conferencia-datas',
+                    title: '2. Conferência das Datas de Reajuste dos Clientes',
+                    objetivo: 'Implementar uma rotina de conferência para garantir que nenhum reajuste contratual seja perdido.',
+                    status: 'Os relatórios necessários para a conferência mensal já foram desenvolvidos e estão prontos para uso.',
+                    proposta: [
+                        'Definir o(a) responsável pela execução da conferência mensal.',
+                        'Alinhar o método de registro e arquivamento das conferências para fins de auditoria e controle.'
+                    ]
+                },
+                {
+                    id: 'faturamento-antecipado',
+                    title: '3. Normalização do Faturamento Antecipado para Bancos',
+                    objetivo: 'Eliminar exceções no processo de faturamento causadas pela antecipação para bancos.',
+                    status: 'Análise em andamento, sob a responsabilidade de Tiago.',
+                    proposta: [
+                        'Apresentar o status da análise de Tiago e alinhar os próximos passos após a conclusão do seu levantamento.'
+                    ]
+                },
+                {
+                    id: 'validacao-faturamento',
+                    title: '4. Validação Formal da Lista de Faturamento',
+                    objetivo: 'Padronizar e formalizar o processo de aprovação da lista de faturamento pelo gestor.',
+                    status: 'Uma proposta de fluxo de validação foi desenhada.',
+                    proposta: [
+                        'Apresentar o modelo de e-mail e o fluxo proposto para validação.',
+                        'Definir os stakeholders que devem ser incluídos na comunicação (em cópia).',
+                        'Obter a aprovação final do processo.'
+                    ]
+                },
+                {
+                    id: 'aviso-previo-distrato',
+                    title: '5. Automatização do Prazo de Aviso Prévio de Distrato',
+                    objetivo: 'Migrar a conferência manual do aviso prévio para uma funcionalidade nativa do ERP, reduzindo o risco de erro humano.',
+                    status: 'Nenhuma ação foi tomada até o momento.',
+                    proposta: [
+                        'Proposta: Utilizar o fluxo do sistema Service como benchmark, aplicando as soluções da base de conhecimento atual.',
+                        'Visão de Futuro: Incluir esta funcionalidade como requisito no benchmark e na implantação do novo ERP.'
+                    ]
+                },
+                {
+                    id: 'politica-bonificacao',
+                    title: '6. Política de Bonificação em Licenciamento',
+                    objetivo: 'Esclarecer e documentar a autonomia dos gestores para conceder bonificações em licenciamento.',
+                    status: 'Decisão Tomada. Está definido que gestores têm autonomia. A liberação operacional será feita por Fernando Menezes.',
+                    proposta: [
+                        'Comunicar a formalização da política.',
+                        'Este item pode ser marcado como "Concluído".'
+                    ]
+                },
+                {
+                    id: 'reducao-retrabalho',
+                    title: '7. Redução de Retrabalho na Parametrização do Faturamento',
+                    objetivo: 'Otimizar o fluxo de cadastro de clientes, antecipando o preenchimento de dados financeiros para reduzir retrabalho.',
+                    status: 'Foi identificado que a parametrização financeira ocorre tardiamente no processo.',
+                    proposta: [
+                        '<strong>Proposta de Novo Fluxo:</strong> Transferir a responsabilidade de liberação inicial do orçamento e preenchimento dos dados financeiros (listados abaixo) do Jurídico para o time Financeiro. O Jurídico atuaria em um segundo momento, na gestão do contrato pendente de assinatura.',
+                        '<strong>Impacto a Validar:</strong> Alinhar com o Jurídico o impacto de remover esta etapa inicial de suas atribuições.',
+                        '<strong>Campos a serem preenchidos pelo Financeiro:</strong>',
+                        '<em>Tela de Liberação:</em> Endereço, Dados do Síndico, Empresa em Lote, Tipo de Faturamento, Forma de Pagamento, Centro de Resultados, Carteiras, Valores, Vencimento, Prazo.',
+                        '<em>Tela de Faturamento em Lote:</em> Valor agrupado, Tipo de tributação, % ISS, Dados de Cobrança.'
+                    ]
+                },
+                {
+                    id: 'revisao-tipos-faturamento',
+                    title: '8. Revisão dos Tipos de Faturamento no ERP',
+                    objetivo: 'Simplificar e padronizar os tipos de faturamento no ERP para melhorar a gestão e reduzir a complexidade.',
+                    status: 'Levantamento concluído. Identificamos a criação de múltiplos tipos desnecessários. A recomendação da "Inside Sistemas" é usar apenas "NFS", "Recibo" e "NFS e Recibo".',
+                    proposta: [
+                        'Proposta: Adotar a padronização da "Inside" e migrar as segmentações atuais para o campo "Carteira de Clientes".',
+                        'Solicitar aprovação para iniciar o plano de ação de limpeza e reclassificação da base.'
+                    ]
+                },
+                {
+                    id: 'datas-faturamento',
+                    title: '9. Estruturação das Datas de Faturamento de Licenciamento',
+                    objetivo: 'Concentrar as emissões de faturamento em datas fixas para otimizar o processo e reduzir a dispersão de trabalho.',
+                    status: 'Possuímos o relatório de volume de emissões por dia do mês.',
+                    proposta: [
+                        'Analisar o relatório em conjunto para definir as 2 melhores datas fixas (ex: dias 10 e 25).',
+                        '<strong>Como medir o impacto?</strong> Proponho cruzarmos os dados de vencimento com o fluxo de caixa para validar se a mudança não gera impacto negativo.',
+                        '<strong>Como atualizar o cronograma?</strong> Definir um plano de comunicação para clientes e áreas internas (Comercial, Sucesso do Cliente) sobre a mudança.'
+                    ]
+                },
+                {
+                    id: 'faturamento-usecorp',
+                    title: '10. Faturamento USECORP – Filial Floripa',
+                    objetivo: 'Diagnosticar e solucionar as falhas específicas no processo de faturamento da Usecorp na filial de Florianópolis.',
+                    status: 'O problema central identificado é a falha de comunicação entre a equipe técnica e a solicitação de faturamento pelo gestor da unidade.',
+                    proposta: [
+                        'Proposta: Implementar um checklist de solicitação de faturamento padronizado. Este checklist deverá ser preenchido pelo gestor da unidade para formalizar o pedido, garantindo que todas as informações necessárias (término da obra, dados do cliente, valores) sejam enviadas corretamente ao time de faturamento.',
+                        'Apresentar um esboço do checklist para validação.'
+                    ]
+                }
+            ];
+
+            const sidebarMenu = document.querySelector('.sidebar-menu');
+            const mainContent = document.getElementById('main-content');
+            const storageKey = 'presentationState';
+            const menuToggle = document.getElementById('menu-toggle');
+
+            function renderContent() {
+                let menuHTML = '';
+                let contentHTML = '';
+
+                topics.forEach(topic => {
+                    menuHTML += `
+                        <li id="menu-item-${topic.id}">
+                            <label>
+                                <input type="checkbox" class="custom-checkbox" data-topic-id="${topic.id}">
+                                <a href="#${topic.id}">${topic.title.substring(topic.title.indexOf(' ') + 1)}</a>
+                            </label>
+                        </li>`;
+                    
+                    let propostaItems = topic.proposta.map(item => `<li>${item}</li>`).join('');
+                    contentHTML += `
+                        <section class="content-section" id="${topic.id}">
+                            <h2>${topic.title}</h2>
+                            <h3>Objetivo</h3>
+                            <p>${topic.objetivo}</p>
+                            <h3>Status Atual</h3>
+                            <p>${topic.status}</p>
+                            <h3>Proposta / Pontos de Decisão</h3>
+                            <ul>${propostaItems}</ul>
+                        </section>`;
+                });
+                
+                sidebarMenu.innerHTML = menuHTML;
+                mainContent.innerHTML = contentHTML;
+            }
+            
+            function loadState() {
+                const savedState = JSON.parse(localStorage.getItem(storageKey)) || {};
+                topics.forEach(topic => {
+                    const isCompleted = savedState[topic.id] || false;
+                    const checkbox = document.querySelector(`.custom-checkbox[data-topic-id="${topic.id}"]`);
+                    if (checkbox) {
+                        checkbox.checked = isCompleted;
+                        updateItemStyle(topic.id, isCompleted);
+                    }
+                });
+            }
+
+            function saveState() {
+                const currentState = {};
+                const checkboxes = document.querySelectorAll('.custom-checkbox');
+                checkboxes.forEach(checkbox => {
+                    currentState[checkbox.dataset.topicId] = checkbox.checked;
+                });
+                localStorage.setItem(storageKey, JSON.stringify(currentState));
+            }
+
+            function updateItemStyle(topicId, isCompleted) {
+                const menuItem = document.getElementById(`menu-item-${topicId}`);
+                if (menuItem) {
+                    menuItem.classList.toggle('completed', isCompleted);
+                }
+            }
+            
+            function setMeetingDate() {
+                const dateElement = document.getElementById('meeting-date');
+                const today = new Date();
+                const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                dateElement.textContent = today.toLocaleDateString('pt-BR', options);
+            }
+
+            function applyFadeEffect() {
+                const sections = document.querySelectorAll('.content-section');
+                const viewportCenter = window.innerHeight / 2;
+
+                sections.forEach(section => {
+                    const rect = section.getBoundingClientRect();
+                    const sectionCenter = rect.top + rect.height / 2;
+                    const distanceToCenter = Math.abs(sectionCenter - viewportCenter);
+                    
+                    const maxDistance = window.innerHeight * 0.5;
+                    let opacity = 1 - (distanceToCenter / maxDistance);
+                    opacity = Math.max(0.25, Math.min(1, opacity));
+
+                    section.style.opacity = opacity;
+                });
+            }
+            
+            // --- INICIALIZAÇÃO E EVENTOS ---
+            renderContent();
+            setMeetingDate();
+            loadState();
+
+            sidebarMenu.addEventListener('change', function(e) {
+                if (e.target.matches('.custom-checkbox')) {
+                    const topicId = e.target.dataset.topicId;
+                    updateItemStyle(topicId, e.target.checked);
+                    saveState();
+                }
+            });
+
+            if (window.innerWidth <= 768) {
+                menuToggle.addEventListener('click', () => {
+                    document.body.classList.toggle('sidebar-closed');
+                });
+                sidebarMenu.addEventListener('click', function(e) {
+                    if (e.target.tagName === 'A') {
+                        document.body.classList.remove('sidebar-closed');
+                    }
+                });
+            }
+
+            window.addEventListener('scroll', applyFadeEffect, { passive: true });
+            window.addEventListener('resize', applyFadeEffect);
+            applyFadeEffect();
+
+        });
+    </script>
+</body>
+</html>
